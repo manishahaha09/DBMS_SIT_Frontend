@@ -1,5 +1,3 @@
-// src/app/repositories/page.tsx
-
 import Link from 'next/link';
 
 const repositories = [

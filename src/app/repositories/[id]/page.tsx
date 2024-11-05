@@ -1,10 +1,7 @@
-// src/app/repositories/[id]/page.tsx
-
 'use client';
 
 import { useState } from 'react';
-import React from 'react'; // Add this import if not already present
-
+import IDEWindow from '../components/IDEWindow';
 
 const repositories = [
   {
@@ -16,35 +13,25 @@ const repositories = [
       { id: 2, message: 'Added README', timestamp: '2024-10-02 12:30' },
     ],
   },
-  {
-    id: 2,
-    name: 'Repo Two',
-    description: 'Second repository',
-    commits: [
-      { id: 1, message: 'Initial commit', timestamp: '2024-10-01 11:00' },
-      { id: 2, message: 'Updated homepage layout', timestamp: '2024-10-03 15:45' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Repo Three',
-    description: 'Third repository',
-    commits: [
-      { id: 1, message: 'Initial commit', timestamp: '2024-10-01 09:00' },
-      { id: 2, message: 'Refactored API calls', timestamp: '2024-10-04 18:20' },
-    ],
-  },
+  // Add more repository data as needed
 ];
 
-const RepositoryDetail = ({ params }: { params: Promise<{ id: string }> }) => {
-    const [selectedCommitId, setSelectedCommitId] = useState<number | null>(null);
-  
-    // Unwrap the params using React.use()
-    const { id } = React.use(params);
-    const repository = repositories.find((repo) => repo.id === Number(id));
+const RepositoryDetail = ({ params }: { params: { id: string } }) => {
+  const [selectedCommitId, setSelectedCommitId] = useState<number | null>(null);
+  const [isIDEOpen, setIsIDEOpen] = useState(false);
+  const repository = repositories.find((repo) => repo.id === Number(params.id));
 
   if (!repository) {
     return <p className="text-center text-xl mt-10">Repository not found</p>;
+  }
+
+  const handleEditClick = (commitId: number) => {
+    setSelectedCommitId(commitId);
+    setIsIDEOpen(true);
+  };
+
+  if (isIDEOpen && selectedCommitId !== null) {
+    return <IDEWindow commitId={selectedCommitId} />;
   }
 
   return (
@@ -53,39 +40,42 @@ const RepositoryDetail = ({ params }: { params: Promise<{ id: string }> }) => {
       <p className="text-gray-700 mb-8">{repository.description}</p>
 
       <h2 className="text-2xl font-semibold text-gray-800 mb-4">Commits</h2>
-      <div className="flex">
-        {/* Vertical timeline with circles */}
-        <div className="relative flex flex-col items-center mr-8">
-          <div className="absolute h-full w-1 bg-gray-300"></div>
-          {repository.commits.map((commit) => (
+      <ul className="space-y-4">
+        {repository.commits.map((commit) => (
+          <li
+            key={commit.id}
+            className={`flex items-center p-4 rounded-lg shadow-md cursor-pointer transition duration-300 ${
+              selectedCommitId === commit.id ? 'bg-blue-100' : 'bg-gray-100'
+            }`}
+            onClick={() => setSelectedCommitId(commit.id)}
+          >
             <button
-              key={commit.id}
-              onClick={() => setSelectedCommitId(commit.id)}
-              className={`w-6 h-6 mb-4 rounded-full border-2 ${
+              className={`w-6 h-6 rounded-full border-2 mr-4 ${
                 selectedCommitId === commit.id ? 'bg-blue-500 border-blue-500' : 'bg-gray-300 border-gray-300'
               }`}
             />
-          ))}
-        </div>
-
-        {/* Commit details */}
-        <ul className="space-y-4 flex-1">
-          {repository.commits.map((commit) => (
-            <li
-              key={commit.id}
-              onClick={() => setSelectedCommitId(commit.id)}
-              className={`p-4 rounded-lg shadow-md cursor-pointer transition duration-300 ${
-                selectedCommitId === commit.id ? 'bg-blue-100' : 'bg-gray-100'
-              }`}
-            >
-              <p className="text-gray-900 font-medium">{commit.message}</p>
+            <div className="flex-1">
+              <p className="text-gray-900 font-medium">
+                Commit #{commit.id}: {commit.message}
+              </p>
               {selectedCommitId === commit.id && (
-                <p className="text-gray-600 text-sm mt-2">{commit.timestamp}</p>
+                <>
+                  <p className="text-gray-600 text-sm mt-2">{commit.timestamp}</p>
+                  <button
+                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditClick(commit.id);
+                    }}
+                  >
+                    Edit
+                  </button>
+                </>
               )}
-            </li>
-          ))}
-        </ul>
-      </div>
+            </div>
+          </li>
+        ))}
+      </ul>
     </main>
   );
 };
