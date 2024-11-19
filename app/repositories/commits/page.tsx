@@ -89,7 +89,10 @@ const RepositoryDetail = () => {
               )}
             </>
           ) : (
-            <button className="bg-gray-600 text-white p-4  rounded-lg shadow-md hover:bg-gray-900 transition">
+            <button
+              className="bg-gray-600 text-white p-4  rounded-lg shadow-md hover:bg-gray-900 transition"
+              onClick={() => { router.push("/repositories/commits/0/edit") }}
+            >
               Create
             </button>
           )}

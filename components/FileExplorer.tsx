@@ -1,6 +1,6 @@
 'use client'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import FileItem from './FileItem';
+import FileItem, { getMaxFileId } from './FileItem';
 import { FileContentUpdate, FileStructure, FileType, Updates } from './IDEWindow';
 
 interface FileExplorerProps {
@@ -47,9 +47,11 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     updateFileContentById(fileStructure, newContent.id, newContent.content);
   }, [newContent, fileStructure]);
 
+  let lastId = getMaxFileId(fileStructure)
+
   const handleAddFile = () => {
     const newFile: FileType = {
-      id: Date.now(), // Using timestamp as unique ID
+      id: (++lastId), // Using timestamp as unique ID
       name: newFileName,
       type: newFileType,
       content: newFileType === 1 ? "New file content" : undefined,
