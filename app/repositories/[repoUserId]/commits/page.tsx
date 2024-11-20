@@ -1,8 +1,9 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 export type Commit = {
   id: number,
@@ -14,10 +15,9 @@ export type Commit = {
 export type Commits = Commit[]
 
 const RepositoryDetail = () => {
+  const { repoUserId } = useParams() as { repoUserId: string }
   const [selectedCommitId, setSelectedCommitId] = useState<number | null>(null);
-  // const repository = repositories.find((repo) => repo.id === Number(params.id));
   const [commits, setCommits] = useState<Commits>([])
-  // const [operation, setOperation] = useState<string>("")
   const router = useRouter()
 
   const getLatestCommit = (commits: Commit[]): Commit | null => {
@@ -32,9 +32,8 @@ const RepositoryDetail = () => {
     const repoId = localStorage.getItem("repoId");
     const fetchCommits = async () => {
       try {
-        const response = await axios.get(`http://localhost:6969/api/fetchCommits/${repoId}`);
+        const response = await axios.get(`${process.env.BACKEND_URL}/api/fetchCommits/${repoId}`);
         setCommits(response.data);
-        console.log(response.data); // Log the fetched commits data here
 
         // If commits were fetched, set the latest commit ID
         if (response.data && response.data.length > 0) {
@@ -49,7 +48,7 @@ const RepositoryDetail = () => {
   }, []);
 
   const handleEditClick = (commitId: number, operation: string) => {
-    router.push(`/repositories/commits/${commitId}/${operation}`)
+    router.push(`/repositories/${repoUserId}/commits/${commitId}/${operation}`)
 
   };
 
@@ -61,7 +60,7 @@ const RepositoryDetail = () => {
         <div className="flex gap-4">
           {selectedCommitId ? (
             <>
-              {selectedCommitId !== getLatestCommit(commits)?.id ? (
+              {(selectedCommitId !== getLatestCommit(commits)?.id || repoUserId !== localStorage.getItem("userId")) ? (
                 <>
                   <button
                     className="bg-gray-600 text-white p-4 rounded-lg shadow-md hover:bg-gray-800 transition"
@@ -88,14 +87,13 @@ const RepositoryDetail = () => {
                 </button>
               )}
             </>
-          ) : (
-            <button
-              className="bg-gray-600 text-white p-4  rounded-lg shadow-md hover:bg-gray-900 transition"
-              onClick={() => { router.push("/repositories/commits/0/edit") }}
-            >
-              Create
-            </button>
-          )}
+          ) : repoUserId === localStorage.getItem("userId") && <button
+            className="bg-gray-600 text-white p-4  rounded-lg shadow-md hover:bg-gray-900 transition"
+            onClick={() => { router.push(`/repositories/${localStorage.getItem("userId")}/commits/0/edit`) }}
+          >
+            Create
+          </button>
+          }
         </div>
       </div>
 

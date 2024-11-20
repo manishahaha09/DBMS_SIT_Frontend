@@ -25,7 +25,7 @@ export type FileUpdate = {
 export type Updates = FileUpdate[];
 export type FileStructure = FileType[];
 
-const IDEWindow = ({ commitId, operation }: { commitId: number, operation: string }) => {
+const IDEWindow = ({ commitId, operation, repoUserId }: { commitId: number, operation: string; repoUserId: string }) => {
   const [activeFile, setActiveFile] = useState(0);
   const [newContent, setNewContent] = useState<FileContentUpdate>({ id: 0, content: "" });
   const [fileStructure, setFileStructure] = useState<FileStructure>([]);
@@ -41,7 +41,6 @@ const IDEWindow = ({ commitId, operation }: { commitId: number, operation: strin
       const url = `http://127.0.0.1:6969/api/fetchFiles/${commitId}`;
       const files = await axios.get(url);
       setFileStructure(files.data || []);
-      console.log(fileStructure)
     };
     getFileStructure();
   }, [commitId]);
@@ -56,23 +55,21 @@ const IDEWindow = ({ commitId, operation }: { commitId: number, operation: strin
 
   const handleCommitConfirm = async () => {
     try {
-      console.log("Sending commit data:", { commit: commitMessage, files: fileStructure });
       const response = await axios.post(
 
         `http://localhost:6969/api/commit/${localStorage.getItem("repoId")}`,
         { commit: commitMessage, files: fileStructure }
       );
-      if (response.data.message === "Insertion Successful") {
+      if (response.data.status === 201) {
         alert("Committed successfully");
         setUpdatedFiles([]); // Clear updated files after successful commit
         setCommitMessage(""); // Clear commit message
       }
     } catch (e) {
-      alert(`Commit failed: ${e}`);
+      alert(`Commit failed: ${e.response.message}`);
     } finally {
       setShowCommitDialog(false); // Close dialog
     }
-    console.log(updatedFiles)
   };
 
   return (
@@ -105,7 +102,7 @@ const IDEWindow = ({ commitId, operation }: { commitId: number, operation: strin
         <div className="flex justify-end space-x-4 mt-4">
           <button
             className="px-4 py-2 bg-red-400 text-white rounded-lg shadow hover:bg-blue-600 transition"
-            onClick={() => router.push("http://localhost:3000/repositories/commits")}
+            onClick={() => router.push(`http://localhost:3000/repositories/${repoUserId}/commits`)}
           >
             See All Commits
           </button>
@@ -124,6 +121,7 @@ const IDEWindow = ({ commitId, operation }: { commitId: number, operation: strin
                   } else {
                     setUpdatedFiles([...updatedFiles, { id: activeFile, modification: "edit" }]);
                   }
+                  alert("File saved successfully")
                 }}
               >
                 Save

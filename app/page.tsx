@@ -22,14 +22,14 @@ const LoginForm = () => {
         password: password,
       })
       if (response.status === 201) {
-        const { message, userId } = response.data
-        console.log(message)
+        const { userId } = response.data
 
         localStorage.setItem("userId", userId)
+        alert("Log In successful")
         router.push('/repositories');
       }
     } catch (error) {
-      alert(error)
+      alert(error.response.data)
       return
     }
   };
@@ -37,7 +37,7 @@ const LoginForm = () => {
 
   return (
     <main className="bg-[url('/img/bg.png')] bg-cover bg-no-repeat h-screen">
-      <div className="w-full h-screen flex justify-center items-center bg-white bg-opacity-10">
+      <div className="w-full h-screen flex justify-center items-center bg-white bg-opacity-10 p-12">
         <div className="w-full h-screen flex justify-center items-center bg-white bg-opacity-10">
           <div>
             <aside className="bg-white w-full max-w-md rounded-xl bg-opacity-30 shadow-lg shadow-black p-4">

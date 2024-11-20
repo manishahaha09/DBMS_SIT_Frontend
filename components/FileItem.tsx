@@ -39,22 +39,6 @@ const FileItem = ({ item, level, setContent, activeFile, setActiveFile, fileCont
   const [newFileName, setNewFileName] = useState('');
   const isFolder = item.type === 2;
 
-  // const getMaxFileId = (fileStructure: FileStructure): number => {
-  //   let maxId = 0;
-  //   const traverse = (files: FileType[]) => {
-  //     files.forEach((file) => {
-  //       if (file.id > maxId) {
-  //         maxId = file.id;
-  //       }
-  //       if (file.children) {
-  //         traverse(file.children);
-  //       }
-  //     });
-  //   };
-  //   traverse(fileStructure);
-  //   return maxId;
-  // };
-
   let lastId = getMaxFileId(files);
 
   const handleAddFile = (parentId: number) => {
