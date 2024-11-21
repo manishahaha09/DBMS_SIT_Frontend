@@ -134,9 +134,7 @@ const IDEWindow = ({ commitId, operation, repoUserId }: { commitId: number, oper
               </button>
             </>
           ) : (
-            <button className="px-4 py-2 bg-red-400 text-white rounded-lg shadow hover:bg-blue-600 transition">
-              Revert
-            </button>
+            <></>
           )}
         </div>
       </div>

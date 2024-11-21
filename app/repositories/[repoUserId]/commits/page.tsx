@@ -71,9 +71,6 @@ const RepositoryDetail = () => {
                   >
                     View
                   </button>
-                  <button className="bg-red-500 text-white p-4 rounded-lg shadow-md hover:bg-gray-800 transition">
-                    Revert
-                  </button>
                 </>
               ) : (
                 <button
